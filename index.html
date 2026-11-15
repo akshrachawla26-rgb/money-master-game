@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Money Master - Financial Literacy Board Game</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js for Infographics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#2B124C',
+              deep: '#522B5B',
+              muted: '#854F6C',
+              soft: '#DFB6B2',
+              cream: '#FBE4D8',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #2B124C;
+      color: #FBE4D8;
+    }
+    
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #2B124C;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #854F6C;
+      border-radius: 4px;
+    }
+
+    /* Dice Animation */
+    .dice-roll {
+      animation: spin 0.6s ease-in-out;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.2); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    .glass-panel {
+      background: rgba(82, 43, 91, 0.65);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(223, 182, 178, 0.25);
+    }
+
+    .space-card {
+      transition: all 0.2s ease;
+    }
+    .space-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(223, 182, 178, 0.2);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- WELCOME / GAME INTRO SCREEN -->
+  <section id="welcomeScreen" class="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden px-5 py-10"
+    style="background: radial-gradient(circle at 50% 35%, #854F6C 0%, #522B5B 38%, #2B124C 78%);">
+    <div class="absolute -top-20 -left-16 w-72 h-72 rounded-full blur-3xl opacity-25" style="background:#DFB6B2"></div>
+    <div class="absolute -bottom-24 -right-16 w-80 h-80 rounded-full blur-3xl opacity-20" style="background:#FBE4D8"></div>
+
+    <div class="relative w-full max-w-5xl text-center">
+      <div class="flex justify-center gap-3 sm:gap-6 mb-7 text-3xl sm:text-5xl" aria-hidden="true">
+        <span class="animate-bounce" style="animation-delay:0ms">💸</span>
+        <span class="animate-bounce" style="animation-delay:120ms">💳</span>
+        <span class="animate-bounce" style="animation-delay:240ms">📈</span>
+        <span class="animate-bounce" style="animation-delay:360ms">🪙</span>
+        <span class="animate-bounce" style="animation-delay:480ms">🏦</span>
+      </div>
+
+      <p class="text-xs sm:text-sm uppercase tracking-[0.35em] font-extrabold mb-4" style="color:#FBE4D8">
+        The Financial Literacy Board Game
+      </p>
+      <h1 class="font-black leading-none tracking-tight mb-5"
+        style="font-size:clamp(3.4rem, 11vw, 8rem); color:#FBE4D8; text-shadow:0 8px 0 rgba(43,18,76,.55), 0 14px 35px rgba(0,0,0,.35);">
+        MONEY<br><span style="color:#DFB6B2">MASTER</span>
+      </h1>
+      <div class="mx-auto mb-7 h-1.5 w-28 rounded-full" style="background:linear-gradient(90deg,#DFB6B2,#FBE4D8)"></div>
+      <p class="mx-auto max-w-2xl text-sm sm:text-lg leading-relaxed mb-8" style="color:#FBE4D8">
+        Make smart moves. Beat the risks. Build your wealth.
+        <span class="block mt-1 font-semibold" style="color:#DFB6B2">Your journey to becoming a Money Master starts here.</span>
+      </p>
+
+      <div class="flex flex-wrap justify-center gap-3 sm:gap-5 mb-9 text-xs sm:text-sm font-bold">
+        <span class="rounded-full px-4 py-2 border border-white/20 bg-white/10">💰 Smart Investments</span>
+        <span class="rounded-full px-4 py-2 border border-white/20 bg-white/10">🛡️ Scam Alerts</span>
+        <span class="rounded-full px-4 py-2 border border-white/20 bg-white/10">📊 Budget Challenges</span>
+        <span class="rounded-full px-4 py-2 border border-white/20 bg-white/10">🎲 Lucky Moves</span>
+      </div>
+
+      <button type="button" onclick="enterGameSetup()"
+        class="group inline-flex items-center gap-3 rounded-2xl px-9 py-4 font-black text-base sm:text-lg shadow-2xl transition duration-200 hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-white/40"
+        style="background:linear-gradient(135deg,#FBE4D8,#DFB6B2); color:#2B124C;">
+        <i class="fa-solid fa-play"></i>
+        LET'S PLAY
+        <i class="fa-solid fa-arrow-right transition-transform group-hover:translate-x-1"></i>
+      </button>
+      <p class="mt-5 text-[10px] sm:text-xs tracking-widest uppercase" style="color:rgba(251,228,216,.65)">
+        Digital Finance • BBA General • Semester I
+      </p>
+    </div>
+  </section>
+
+
+  <!-- Header Section -->
+  <header class="glass-panel border-b border-brand-soft/20 sticky top-0 z-30 px-4 py-3 shadow-lg">
+    <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-muted to-brand-soft flex items-center justify-center shadow-md">
+          <i class="fa-solid me-0 fa-sack-dollar text-brand-dark text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-brand-cream">MONEY MASTER</h1>
+          <p class="text-xs text-brand-soft/80 font-medium">Digital Finance & Smart Money Management (Course: 24BBM1104)</p>
+        </div>
+      </div>
+
+      <!-- Action Nav Buttons -->
+      <div class="flex items-center gap-2 flex-wrap">
+        <button onclick="openModal('rulesModal')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-brand-muted hover:bg-brand-soft hover:text-brand-dark text-brand-cream transition flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-book-open"></i> Game Rules
+        </button>
+        <button onclick="openModal('infographicModal')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-brand-deep border border-brand-soft/30 hover:border-brand-soft text-brand-cream transition flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-chart-pie"></i> Financial Guides
+        </button>
+        <button onclick="openModal('academicModal')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-brand-deep border border-brand-soft/30 hover:border-brand-soft text-brand-cream transition flex items-center gap-1.5 shadow">
+          <i class="fa-solid fa-graduation-cap"></i> Course References
+        </button>
+        <button onclick="resetGame()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-900/40 border border-red-500/40 hover:bg-red-800/60 text-red-200 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-rotate-right"></i> Reset
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Game Container -->
+  <main class="max-w-7xl w-full mx-auto p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6 flex-grow">
+
+    <!-- Left Control Panel & Player Status (1 Col on LG) -->
+    <div class="lg:col-span-1 flex flex-col gap-5">
+      
+      <!-- Player Selection (Before Game Starts) / Active Turn Status -->
+      <div class="glass-panel p-5 rounded-2xl shadow-md border border-brand-soft/20">
+        <h2 class="text-base font-bold text-brand-cream mb-3 flex items-center justify-between">
+          <span><i class="fa-solid fa-users text-brand-soft mr-2"></i>Players Dashboard</span>
+          <span id="turnIndicatorBadge" class="text-xs bg-brand-muted px-2 py-0.5 rounded text-brand-cream font-normal">Setup Phase</span>
+        </h2>
+
+        <!-- Game Config setup -->
+        <div id="setupPanel" class="space-y-3">
+          <label class="text-xs text-brand-soft block font-medium">Select Number of Players:</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="setPlayerCount(2)" id="btnP2" class="py-2 text-xs font-bold rounded-lg border border-brand-soft bg-brand-muted text-brand-cream">2 Players</button>
+            <button onclick="setPlayerCount(3)" id="btnP3" class="py-2 text-xs font-bold rounded-lg border border-brand-soft/30 bg-brand-deep text-brand-soft">3 Players</button>
+            <button onclick="setPlayerCount(4)" id="btnP4" class="py-2 text-xs font-bold rounded-lg border border-brand-soft/30 bg-brand-deep text-brand-soft">4 Players</button>
+          </div>
+          <button onclick="startGame()" class="w-full mt-3 py-2.5 bg-gradient-to-r from-brand-muted to-brand-soft text-brand-dark font-extrabold rounded-xl shadow-lg hover:brightness-110 transition">
+            <i class="fa-solid fa-play mr-1"></i> Start Game
+          </button>
+        </div>
+
+        <!-- Dynamic Players List -->
+        <div id="playersList" class="space-y-3 hidden">
+          <!-- Player items rendered dynamically JS -->
+        </div>
+      </div>
+
+      <!-- Turn & Dice Controller -->
+      <div id="controlsPanel" class="glass-panel p-5 rounded-2xl shadow-md border border-brand-soft/20 text-center opacity-50 pointer-events-none">
+        <span class="text-xs font-bold tracking-wider uppercase text-brand-soft/80 block mb-1">Current Turn</span>
+        <div id="activePlayerDisplay" class="text-lg font-black text-brand-cream mb-4">Player 1</div>
+
+        <!-- Interactive Dice -->
+        <div class="flex flex-col items-center justify-center my-2">
+          <div id="diceBox" class="w-20 h-20 rounded-2xl bg-gradient-to-br from-brand-cream to-brand-soft text-brand-dark flex items-center justify-center text-4xl font-extrabold shadow-xl border-2 border-brand-cream cursor-pointer transition hover:scale-105" onclick="rollDice()">
+            <span id="diceValue"><i class="fa-solid fa-dice-d6"></i></span>
+          </div>
+          <p class="text-xs text-brand-soft/70 mt-2 font-medium">Click dice or button to roll (1-6)</p>
+        </div>
+
+        <button id="rollBtn" onclick="rollDice()" class="w-full mt-3 py-2.5 bg-brand-soft text-brand-dark font-bold rounded-xl shadow hover:bg-brand-cream transition">
+          <i class="fa-solid fa-dice mr-1"></i> Roll Dice
+        </button>
+      </div>
+
+      <!-- Quick Concept Mini-Widget -->
+      <div class="glass-panel p-4 rounded-2xl border border-brand-soft/20 text-xs text-brand-cream/90 space-y-2">
+        <div class="font-bold text-brand-soft flex items-center gap-1.5">
+          <i class="fa-solid fa-lightbulb text-amber-300"></i> Smart Money Tip
+        </div>
+        <p id="randomTip" class="italic text-brand-soft/90 leading-relaxed">
+          "Always maintain an Emergency Fund worth 3 to 6 months of living expenses in liquid deposits."
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Right Side: Interactive Board Layout (3 Cols on LG) -->
+    <div class="lg:col-span-3 flex flex-col gap-4">
+      
+      <!-- Board Header/Status Strip -->
+      <div class="glass-panel px-4 py-3 rounded-xl flex items-center justify-between text-xs text-brand-cream border border-brand-soft/20">
+        <div class="flex items-center gap-4">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> Start / Reward</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500"></span> Decision / Risk</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-blue-500"></span> Knowledge / Calc</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-purple-500"></span> Chance</span>
+        </div>
+        <div id="gameStatusLog" class="font-mono text-brand-soft truncate max-w-xs">
+          Game ready. Click 'Start Game'.
+        </div>
+      </div>
+
+      <!-- The Board Grid Container (24 Spaces in perimeter/snake loop) -->
+      <div class="glass-panel p-4 rounded-2xl border border-brand-soft/20 relative shadow-2xl">
+        <div id="boardGrid" class="grid grid-cols-4 sm:grid-cols-6 gap-2.5">
+          <!-- 24 Interactive Spaces generated by JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="glass-panel border-t border-brand-soft/20 py-3 px-4 text-center text-xs text-brand-soft/70">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>Digital Finance Project | BBA General (Sem 1) | Course Code: 24BBM1104</p>
+      <p>Theme 1: Financial Literacy & Smart Money Management</p>
+    </div>
+  </footer>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- CARD CHALLENGE MODAL -->
+  <div id="cardModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+    <div class="glass-panel max-w-xl w-full rounded-2xl p-6 border-2 border-brand-soft shadow-2xl text-brand-cream relative animate-fade-in">
+      
+      <div class="flex items-center justify-between border-b border-brand-soft/30 pb-3 mb-4">
+        <div class="flex items-center gap-2">
+          <span id="cardBadge" class="px-2.5 py-1 text-xs font-bold rounded-lg bg-brand-muted text-brand-cream uppercase tracking-wide">
+            Knowledge Card
+          </span>
+          <h3 id="cardSpaceTitle" class="text-sm font-semibold text-brand-soft">Space 4: Power of Compounding</h3>
+        </div>
+        <span id="modalPlayerTag" class="text-xs font-bold bg-brand-deep px-2.5 py-1 rounded-full border border-brand-soft/30 text-brand-cream">
+          Player 1
+        </span>
+      </div>
+
+      <!-- Card Content -->
+      <div id="cardMainContent" class="space-y-4">
+        <h4 id="cardQuestion" class="text-base sm:text-lg font-bold leading-snug">
+          Question content will appear here...
+        </h4>
+        <p id="cardDescription" class="text-xs text-brand-soft leading-relaxed">
+          Detailed context or scenario description.
+        </p>
+
+        <!-- Dynamic Options / Actions Container -->
+        <div id="cardOptions" class="space-y-2.5 pt-2">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Result / Feedback Block -->
+        <div id="cardFeedback" class="hidden p-3.5 rounded-xl border text-xs leading-relaxed mt-4">
+          <!-- Feedback message -->
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="mt-6 border-t border-brand-soft/30 pt-3 flex justify-end">
+        <button id="cardContinueBtn" onclick="closeCardModal()" class="hidden px-5 py-2 bg-gradient-to-r from-brand-muted to-brand-soft text-brand-dark font-extrabold rounded-xl shadow hover:brightness-110 transition">
+          Continue Turn <i class="fa-solid fa-arrow-right ml-1"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME RULES MODAL -->
+  <div id="rulesModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+    <div class="glass-panel max-w-2xl w-full max-h-[85vh] overflow-y-auto rounded-2xl p-6 border border-brand-soft shadow-2xl text-brand-cream relative">
+      <div class="flex justify-between items-center border-b border-brand-soft/30 pb-3 mb-4">
+        <h3 class="text-lg font-bold text-brand-cream flex items-center gap-2">
+          <i class="fa-solid fa-book-open text-brand-soft"></i> Money Master - Game Rules & Instructions
+        </h3>
+        <button onclick="closeModal('rulesModal')" class="text-brand-soft hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm text-brand-cream/90 leading-relaxed">
+        <div class="bg-brand-deep/80 p-3 rounded-xl border border-brand-soft/20">
+          <h4 class="font-bold text-brand-soft mb-1">Objective</h4>
+          <p>Navigate through financial challenges, make smart decisions, answer questions, identify risks, and reach the finish line with the highest **Financial Literacy Score (FLS)** and accumulated **Capital (₹)**.</p>
+        </div>
+
+        <h4 class="font-bold text-brand-soft text-base border-b border-brand-soft/20 pb-1 mt-3">Step-by-Step Instructions</h4>
+        
+        <ol class="list-decimal pl-5 space-y-2">
+          <li><strong>Player Setup:</strong> Select 2 to 4 players. Each player begins at Space 1 (START) with an initial capital of <strong>₹50,000</strong> and <strong>100 Literacy Points</strong>.</li>
+          <li><strong>Turn Mechanics:</strong> Players take turns rolling the 6-sided dice. The player token automatically advances by the number rolled.</li>
+          <li><strong>Landing on Spaces:</strong> When landing on a space, a challenge card triggers corresponding to that space category:
+            <ul class="list-disc pl-5 mt-1 space-y-1 text-brand-soft">
+              <li><strong>Chance Cards:</strong> Handles unexpected financial emergencies, investment windfalls, or market changes.</li>
+              <li><strong>Decision Cards:</strong> Choose between two financial options (e.g., FD vs High-Yield Savings). Read options carefully!</li>
+              <li><strong>Knowledge Cards:</strong> Multiple-choice questions on digital banking, UPI safety, compounding, and taxation.</li>
+              <li><strong>Risk Cards:</strong> Identify phishing scams, fraudulent QR codes, and Ponzi schemes.</li>
+              <li><strong>Calculation Cards:</strong> Solve practical budgeting, compound interest, or loan interest calculations.</li>
+              <li><strong>Reward Spaces:</strong> Bonus points and capital cash rewards for financial discipline.</li>
+            </ul>
+          </li>
+          <li><strong>Rewards & Penalties:</strong> Correct decisions and answers earn +₹5,000 to +₹15,000 and +20 Literacy Points. Incorrect choices or falling for scams incur cash losses and point deductions.</li>
+          <li><strong>Winning the Game:</strong> The game ends when all players reach Space 24 (FINISH) or complete the board. The player with the highest total financial score (Capital + [Literacy Points × ₹500]) is crowned the <strong>Money Master</strong>!</li>
+        </ol>
+
+        <div class="p-3 bg-brand-muted/30 border border-brand-soft/30 rounded-xl text-xs">
+          <strong>Academic Note:</strong> Designed according to BBA Digital Finance Assignment Guidelines for Theme 1: Financial Literacy and Smart Money Management.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFOGRAPHIC DASHBOARD MODAL -->
+  <div id="infographicModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+    <div class="glass-panel max-w-4xl w-full max-h-[85vh] overflow-y-auto rounded-2xl p-6 border border-brand-soft shadow-2xl text-brand-cream relative">
+      <div class="flex justify-between items-center border-b border-brand-soft/30 pb-3 mb-4">
+        <h3 class="text-lg font-bold text-brand-cream flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie text-brand-soft"></i> Financial Literacy Visual Infographics
+        </h3>
+        <button onclick="closeModal('infographicModal')" class="text-brand-soft hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        
+        <!-- Infographic 1: Compounding -->
+        <div class="bg-brand-deep/80 p-4 rounded-xl border border-brand-soft/20 flex flex-col justify-between">
+          <div>
+            <h4 class="font-bold text-brand-soft text-sm mb-1"><i class="fa-solid fa-arrow-trend-up mr-1"></i> 1. The Power of Compounding</h4>
+            <p class="text-brand-soft/80 mb-3">Starting early allows compound interest to exponential grow your wealth over time ($A = P(1 + r/n)^{nt}$).</p>
+          </div>
+          <div class="h-44 bg-brand-dark/40 p-2 rounded-lg">
+            <canvas id="compoundingChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Infographic 2: 50/30/20 Rule -->
+        <div class="bg-brand-deep/80 p-4 rounded-xl border border-brand-soft/20 flex flex-col justify-between">
+          <div>
+            <h4 class="font-bold text-brand-soft text-sm mb-1"><i class="fa-solid fa-pie-chart mr-1"></i> 2. The 50/30/20 Budgeting Rule</h4>
+            <p class="text-brand-soft/80 mb-3">Allocate monthly income wisely: 50% Needs, 30% Wants, and 20% Savings/Investments.</p>
+          </div>
+          <div class="h-44 bg-brand-dark/40 p-2 rounded-lg flex items-center justify-center">
+            <canvas id="budgetChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Infographic 3: Risk vs Return -->
+        <div class="bg-brand-deep/80 p-4 rounded-xl border border-brand-soft/20">
+          <h4 class="font-bold text-brand-soft text-sm mb-2"><i class="fa-solid fa-scale-balanced mr-1"></i> 3. Risk vs Return Spectrum</h4>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between p-2 rounded bg-brand-dark/40">
+              <span>Savings Bank / FD</span>
+              <span class="text-emerald-400 font-semibold">Low Risk | Low Return (3-7%)</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-brand-dark/40">
+              <span>Mutual Funds / Debt</span>
+              <span class="text-yellow-400 font-semibold">Moderate Risk | Moderate Return (8-12%)</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded bg-brand-dark/40">
+              <span>Direct Equities / Stocks</span>
+              <span class="text-amber-400 font-semibold">High Risk | High Return (12-18%+)</span>
+            </div>
+            <div class="flex items-center justify-between p-2 rounded border border-red-500/40 bg-red-950/30">
+              <span>Unregulated Ponzi Schemes</span>
+              <span class="text-red-400 font-bold">Extreme Risk | FRAUD (Loss of Principal)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Infographic 4: UPI & Fraud Safety Checklist -->
+        <div class="bg-brand-deep/80 p-4 rounded-xl border border-brand-soft/20">
+          <h4 class="font-bold text-brand-soft text-sm mb-2"><i class="fa-solid fa-shield-halved mr-1"></i> 4. Digital Payment Security Rules</h4>
+          <ul class="space-y-1.5 list-disc pl-4 text-brand-cream/90">
+            <li><strong>PIN is ONLY for deducting money:</strong> You NEVER enter your UPI PIN to receive money.</li>
+            <li><strong>Verify QR Codes:</strong> Beware of callers sending QR codes claiming to send rewards or refunds.</li>
+            <li><strong>Check SMS Alerts:</strong> Always read transaction confirmation messages from official bank sender IDs.</li>
+            <li><strong>Grievance Redressal:</strong> Report unauthorized transactions to your bank immediately within 3 days.</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ACADEMIC INFO & REFERENCES MODAL -->
+  <div id="academicModal" class="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+    <div class="glass-panel max-w-xl w-full rounded-2xl p-6 border border-brand-soft shadow-2xl text-brand-cream relative">
+      <div class="flex justify-between items-center border-b border-brand-soft/30 pb-3 mb-4">
+        <h3 class="text-lg font-bold text-brand-cream flex items-center gap-2">
+          <i class="fa-solid fa-graduation-cap text-brand-soft"></i> Academic Information & References
+        </h3>
+        <button onclick="closeModal('academicModal')" class="text-brand-soft hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm">
+        <div class="bg-brand-deep p-4 rounded-xl border border-brand-soft/20 space-y-1 text-brand-soft">
+          <p><strong class="text-brand-cream">Course Title:</strong> Digital Finance</p>
+          <p><strong class="text-brand-cream">Course Code:</strong> 24BBM1104</p>
+          <p><strong class="text-brand-cream">Programme:</strong> BBA General (Semester I)</p>
+          <p><strong class="text-brand-cream">Assignment:</strong> Infographic Board Game Activity</p>
+          <p><strong class="text-brand-cream">Selected Theme:</strong> Theme 1: Financial Literacy and Smart Money Management</p>
+        </div>
+
+        <div>
+          <h4 class="font-bold text-brand-soft mb-2 text-sm">Credible Academic & Institutional References:</h4>
+          <ol class="list-decimal pl-5 space-y-2 text-brand-cream/90 text-xs">
+            <li><strong>Reserve Bank of India (RBI):</strong> <em>Financial Education Master Circular & Financial Literacy Guide</em>. Available at: rbi.org.in</li>
+            <li><strong>Securities and Exchange Board of India (SEBI):</strong> <em>Investor Education Portal (Saa₹thi App) & Capital Market Basics</em>. Available at: investor.sebi.gov.in</li>
+            <li><strong>National Centre for Financial Education (NCFE):</strong> <em>National Strategy for Financial Education (NSFE 2020-2025)</em>. Available at: ncfe.org.in</li>
+            <li><strong>National Payments Corporation of India (NPCI):</strong> <em>UPI Security Guidelines & Safe Digital Payment Practices</em>. Available at: npci.org.in</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME OVER / LEADERBOARD MODAL -->
+  <div id="gameOverModal" class="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+    <div class="glass-panel max-w-lg w-full rounded-2xl p-6 border-2 border-brand-soft shadow-2xl text-brand-cream text-center relative animate-bounce-in">
+      <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-tr from-yellow-400 to-amber-600 flex items-center justify-center text-3xl text-brand-dark shadow-lg">
+        <i class="fa-solid fa-trophy"></i>
+      </div>
+      <h2 class="text-2xl font-black text-brand-cream mb-1">Game Completed!</h2>
+      <p class="text-xs text-brand-soft mb-4">Congratulations to all players for advancing their financial literacy!</p>
+
+      <div id="leaderboardList" class="space-y-2 text-left mb-6">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <button onclick="resetGame(); closeModal('gameOverModal');" class="w-full py-3 bg-gradient-to-r from-brand-muted to-brand-soft text-brand-dark font-black rounded-xl shadow-lg hover:brightness-110 transition">
+        <i class="fa-solid fa-rotate-right mr-2"></i> Play Again
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ================= JAVASCRIPT LOGIC ================= -->
+  <script>
+    /* ================= GAME STATE & DATA ================= */
+    
+    // Player Tokens Colors & Icons
+    const PLAYER_CONFIGS = [
+      { id: 0, name: "Player 1", color: "#DFB6B2", icon: "fa-user-ninja", bg: "bg-rose-900/60" },
+      { id: 1, name: "Player 2", color: "#FBE4D8", icon: "fa-user-astronaut", bg: "bg-purple-900/60" },
+      { id: 2, name: "Player 3", color: "#854F6C", icon: "fa-user-tie", bg: "bg-pink-900/60" },
+      { id: 3, name: "Player 4", color: "#E0E7FF", icon: "fa-user-secret", bg: "bg-indigo-900/60" }
+    ];
+
+    let playerCount = 2;
+    let players = [];
+    let activePlayerIndex = 0;
+    let gameStarted = false;
+    let isDiceRolling = false;
+
+    // 24 Board Spaces Definition
+    const BOARD_SPACES = [
+      { id: 0, title: "START", type: "start", icon: "fa-flag-checkered", desc: "Collect ₹10,000 allowance each lap." },
+      { id: 1, title: "Emergency Fund", type: "knowledge", icon: "fa-vault", desc: "Knowledge Card" },
+      { id: 2, title: "FD vs High-Yield", type: "decision", icon: "fa-scale-unbalanced", desc: "Decision Card" },
+      { id: 3, title: "Phishing SMS", type: "risk", icon: "fa-fish-fins", desc: "Risk Card" },
+      { id: 4, title: "Compounding Math", type: "calc", icon: "fa-calculator", desc: "Calculation Card" },
+      { id: 5, title: "Market Windfall", type: "chance", icon: "fa-clover", desc: "Chance Card" },
+      { id: 6, title: "Smart Saver Bonus", type: "reward", icon: "fa-award", desc: "Reward Space (+₹10,000, +20 FLS)" },
+      { id: 7, title: "UPI QR Fraud", type: "risk", icon: "fa-qrcode", desc: "Risk Card" },
+      { id: 8, title: "50/30/20 Budgeting", type: "calc", icon: "fa-pie-chart", desc: "Calculation Card" },
+      { id: 9, title: "Term vs Endowment", type: "decision", icon: "fa-shield-heart", desc: "Decision Card" },
+      { id: 10, title: "Medical Emergency", type: "chance", icon: "fa-kit-medical", desc: "Chance Card" },
+      { id: 11, title: "Inflation Impact", type: "knowledge", icon: "fa-arrow-trend-down", desc: "Knowledge Card" },
+      { id: 12, title: "Midway Dividend", type: "reward", icon: "fa-sack-dollar", desc: "Reward Space (+₹12,000)" },
+      { id: 13, title: "Ponzi Scheme Trap", type: "risk", icon: "fa-triangle-exclamation", desc: "Risk Card" },
+      { id: 14, title: "Loan Interest Math", type: "calc", icon: "fa-percent", desc: "Calculation Card" },
+      { id: 15, title: "ELSS Tax Saving", type: "decision", icon: "fa-file-invoice-dollar", desc: "Decision Card" },
+      { id: 16, title: "Unexpected Bonus", type: "chance", icon: "fa-gift", desc: "Chance Card" },
+      { id: 17, title: "CIBIL Credit Score", type: "knowledge", icon: "fa-star font-bold", desc: "Knowledge Card" },
+      { id: 18, title: "Financial Discipline", type: "reward", icon: "fa-medal", desc: "Reward Space (+15 FLS)" },
+      { id: 19, title: "Fake Customer Care", type: "risk", icon: "fa-headset", desc: "Risk Card" },
+      { id: 20, title: "Net Return Calc", type: "calc", icon: "fa-square-root-variable", desc: "Calculation Card" },
+      { id: 21, title: "Crypto Hype", type: "decision", icon: "fa-coins", desc: "Decision Card" },
+      { id: 22, title: "Tax Refund Gain", type: "chance", icon: "fa-hand-holding-dollar", desc: "Chance Card" },
+      { id: 23, title: "FINISH / VICTORY", type: "finish", icon: "fa-trophy text-amber-400", desc: "Reach or pass to end game!" }
+    ];
+
+    // Card Questions Repository
+    const CARD_DATA = {
+      // 1. KNOWLEDGE CARDS
+      knowledge: [
+        {
+          title: "Emergency Fund Essentials",
+          question: "How many months of living expenses should ideally be kept in an liquid Emergency Fund?",
+          options: [
+            { text: "1 to 2 Weeks", correct: false, reason: "Too short! Unexpected emergencies often require several months of safety net." },
+            { text: "3 to 6 Months", correct: true, reason: "Correct! Financial planners recommend 3-6 months in liquid deposits for job loss or medical emergencies." },
+            { text: "5 to 10 Years", correct: false, reason: "Excessive liquidity leads to money losing purchasing power against inflation." }
+          ]
+        },
+        {
+          title: "Inflation Impact",
+          question: "If inflation rate is 6% per annum and your savings account yields 3% interest, what happens to your purchasing power?",
+          options: [
+            { text: "Purchasing power increases by 3%", correct: false, reason: "Incorrect. Your return is below the inflation rate." },
+            { text: "Purchasing power decreases (negative real return)", correct: true, reason: "Correct! Real Return = Nominal Return (3%) - Inflation (6%) = -3%." },
+            { text: "Purchasing power remains completely unchanged", correct: false, reason: "Inflation erodes money value if returns don't outpace it." }
+          ]
+        },
+        {
+          title: "CIBIL & Credit Scores",
+          question: "Which of the following actions HIGHEST boosts your credit score (CIBIL score)?",
+          options: [
+            { text: "Paying credit card bills and loan EMIs in full on time", correct: true, reason: "Correct! Repayment history accounts for ~35% of your credit score." },
+            { text: "Applying for multiple loan cards simultaneously", correct: false, reason: "Multiple hard inquiries actually lower your score." },
+            { text: "Never using any credit or digital payment channels", correct: false, reason: "Having no credit history makes lenders unable to evaluate risk." }
+          ]
+        }
+      ],
+
+      // 2. DECISION CARDS
+      decision: [
+        {
+          title: "Fixed Deposit vs High-Yield Savings",
+          question: "You have ₹50,000 surplus money for a 1-year goal. Option A: Fixed Deposit at 7.5% per annum. Option B: Regular Savings Account at 3.0%. Which is better?",
+          options: [
+            { text: "Option A: 7.5% Fixed Deposit", correct: true, reason: "Smart choice! Fixed Deposit locks in higher returns with safety for fixed horizons." },
+            { text: "Option B: 3.0% Savings Account", correct: false, reason: "Sub-optimal. Keeping excess idle funds in low-yield savings loses to inflation." }
+          ]
+        },
+        {
+          title: "Life Insurance Choice",
+          question: "A 22-year-old earning student wants pure life protection. Option A: Pure Term Insurance Plan (High cover, low premium). Option B: Traditional Endowment/Savings Plan.",
+          options: [
+            { text: "Option A: Pure Term Insurance Plan", correct: true, reason: "Excellent choice! Term insurance provides high sum assured at lowest cost. Invest savings separately." },
+            { text: "Option B: Endowment Plan", correct: false, reason: "Endowment plans mix insurance with low investment yields (~4-5%)." }
+          ]
+        },
+        {
+          title: "Tax Saving Investments",
+          question: "To save income tax under Section 80C while growing wealth long term. Option A: ELSS Equity Mutual Fund (3 yr lock-in). Option B: Idle cash in savings account.",
+          options: [
+            { text: "Option A: ELSS Mutual Fund", correct: true, reason: "Correct! ELSS offers tax deductions + inflation-beating equity growth." },
+            { text: "Option B: Keep as idle cash", correct: false, reason: "Idle cash does not qualify for tax deduction under Section 80C." }
+          ]
+        }
+      ],
+
+      // 3. RISK CARDS
+      risk: [
+        {
+          title: "Phishing & Fake QR Code Scam",
+          question: "A stranger online offers to pay you ₹2,000 for an item. They send a QR code and say 'Scan this & enter your UPI PIN to RECEIVE payment'. What should you do?",
+          options: [
+            { text: "Scan and enter UPI PIN immediately", correct: false, reason: "SCAM ALERT! Entering UPI PIN ALWAYS deducts money from your account!" },
+            { text: "Refuse. UPI PIN is NEVER required to receive money", correct: true, reason: "Spot on! Money gets credited directly without entering your PIN." }
+          ]
+        },
+        {
+          title: "Unregulated Ponzi Scheme Trap",
+          question: "An offline agent promises 'Guaranteed double your money in 3 months with zero risk!'. How do you evaluate this opportunity?",
+          options: [
+            { text: "Invest full savings quickly", correct: false, reason: "Classic Ponzi scheme red flag! Guaranteed high returns with zero risk is impossible." },
+            { text: "Reject & report. High return always comes with risk; guaranteed double is fraud", correct: true, reason: "Correct! Always verify SEBI/RBI registration of investment platforms." }
+          ]
+        },
+        {
+          title: "Fake Bank Customer Care Call",
+          question: "You receive a call from an unknown number claiming to be your bank manager asking for your OTP to stop account block.",
+          options: [
+            { text: "Never share OTP. Banks never ask for OTP or PINs over call", correct: true, reason: "Correct! Banks strictly advise against sharing confidential OTPs." },
+            { text: "Share OTP quickly to prevent account freeze", correct: false, reason: "Sharing OTP gives fraudsters full control over your bank account." }
+          ]
+        }
+      ],
+
+      // 4. CALCULATION CARDS
+      calc: [
+        {
+          title: "50/30/20 Budgeting Rule",
+          question: "If your monthly take-home salary is ₹40,000. According to the 50/30/20 rule, how much should be allocated to SAVINGS?",
+          options: [
+            { text: "₹8,000 (20%)", correct: true, reason: "Calculated correctly! 20% of ₹40,000 = ₹8,000." },
+            { text: "₹12,000 (30%)", correct: false, reason: "30% is allocated for 'Wants/Wishes', not savings." },
+            { text: "₹20,000 (50%)", correct: false, reason: "50% is allocated for essential 'Needs'." }
+          ]
+        },
+        {
+          title: "Simple Interest Savings Math",
+          question: "You deposit ₹10,000 in a fixed deposit at 8% simple interest per year. What is the total interest earned after 2 years?",
+          options: [
+            { text: "₹1,600", correct: true, reason: "Correct! SI = (P × R × T)/100 = (10,000 × 8 × 2)/100 = ₹1,600." },
+            { text: "₹800", correct: false, reason: "₹800 is interest for only 1 year." },
+            { text: "₹2,400", correct: false, reason: "Incorrect interest calculation." }
+          ]
+        },
+        {
+          title: "Compound Interest Awareness",
+          question: "₹10,000 invested at 10% annual compound interest grows to how much at the end of 2 years?",
+          options: [
+            { text: "₹12,100", correct: true, reason: "Correct! Year 1 = ₹11,000. Year 2 = ₹11,000 + 10% (1,100) = ₹12,100." },
+            { text: "₹12,000", correct: false, reason: "₹12,000 is simple interest. Compounding earns interest on interest (+₹100)!" }
+          ]
+        }
+      ],
+
+      // 5. CHANCE CARDS
+      chance: [
+        { title: "Medical Emergency", reward: false, amount: 5000, points: 5, text: "Unexpected hospital bill! Health insurance covered most, but out-of-pocket costs deduction ₹5,000." },
+        { title: "Stock Dividend Yield", reward: true, amount: 8000, points: 15, text: "Your diversified index fund paid annual dividends! Gain ₹8,000 cash & +15 Financial Literacy Points." },
+        { title: "Unclaimed Bank Account Recovery", reward: true, amount: 10000, points: 10, text: "RBI UDGAM portal helped trace forgotten relative deposit! Received ₹10,000." },
+        { title: "Vehicle Repair Emergency", reward: false, amount: 4000, points: 0, text: "Unplanned bike breakdown repair cost ₹4,000. Emergency fund saved you from high interest debt!" }
+      ]
+    };
+
+    // Financial Tips
+    const TIPS = [
+      "Always maintain an Emergency Fund worth 3 to 6 months of living expenses in liquid deposits.",
+      "The 50/30/20 Rule: 50% Needs, 30% Wants, 20% Investments & Savings.",
+      "Rule of 72: Divide 72 by interest rate to find years needed to double your money.",
+      "Never share your UPI PIN or OTP with anyone. UPI PIN is ONLY entered to pay money, never to receive.",
+      "Term Insurance gives high life coverage at low cost. Don't mix insurance with investments."
+    ];
+
+    /* ================= INITIALIZATION ================= */
+
+    window.onload = function() {
+      renderBoard();
+      initCharts();
+      updatePlayerSetupButtons();
+    };
+
+    function enterGameSetup() {
+      const welcome = document.getElementById('welcomeScreen');
+      welcome.style.transition = 'opacity 350ms ease, transform 350ms ease';
+      welcome.style.opacity = '0';
+      welcome.style.transform = 'scale(1.03)';
+      setTimeout(() => {
+        welcome.classList.add('hidden');
+        document.getElementById('setupPanel')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 360);
+    }
+
+    function setPlayerCount(count) {
+      playerCount = count;
+      updatePlayerSetupButtons();
+    }
+
+    function updatePlayerSetupButtons() {
+      [2, 3, 4].forEach(n => {
+        const btn = document.getElementById(`btnP${n}`);
+        if (n === playerCount) {
+          btn.className = "py-2 text-xs font-bold rounded-lg border border-brand-soft bg-brand-muted text-brand-cream shadow";
+        } else {
+          btn.className = "py-2 text-xs font-bold rounded-lg border border-brand-soft/30 bg-brand-deep text-brand-soft opacity-70";
+        }
+      });
+    }
+
+    function startGame() {
+      players = [];
+      for (let i = 0; i < playerCount; i++) {
+        players.push({
+          ...PLAYER_CONFIGS[i],
+          position: 0,
+          cash: 50000,
+          fls: 100,
+          finished: false
+        });
+      }
+
+      gameStarted = true;
+      activePlayerIndex = 0;
+
+      document.getElementById('setupPanel').classList.add('hidden');
+      document.getElementById('playersList').classList.remove('hidden');
+      document.getElementById('controlsPanel').classList.remove('opacity-50', 'pointer-events-none');
+      document.getElementById('turnIndicatorBadge').innerText = "Game In Progress";
+
+      updatePlayersUI();
+      updateBoardTokens();
+      logStatus(`Game started with ${playerCount} players. ${players[0].name}'s turn!`);
+      updateActiveTurnDisplay();
+    }
+
+    function resetGame() {
+      gameStarted = false;
+      activePlayerIndex = 0;
+      players = [];
+      
+      document.getElementById('setupPanel').classList.remove('hidden');
+      document.getElementById('playersList').classList.add('hidden');
+      document.getElementById('controlsPanel').classList.add('opacity-50', 'pointer-events-none');
+      document.getElementById('turnIndicatorBadge').innerText = "Setup Phase";
+      document.getElementById('diceValue').innerHTML = `<i class="fa-solid fa-dice-d6"></i>`;
+      
+      renderBoard();
+      logStatus("Game reset. Select players to begin.");
+    }
+
+    /* ================= BOARD RENDERER ================= */
+
+    function renderBoard() {
+      const grid = document.getElementById('boardGrid');
+      grid.innerHTML = '';
+
+      BOARD_SPACES.forEach((space, idx) => {
+        let typeBg = "bg-brand-deep/70 border-brand-soft/20 text-brand-cream";
+        let badgeBg = "bg-brand-muted text-brand-cream";
+
+        if (space.type === 'start') typeBg = "bg-emerald-950/70 border-emerald-500/50 text-emerald-200";
+        else if (space.type === 'reward') typeBg = "bg-emerald-900/40 border-emerald-400/40 text-emerald-100";
+        else if (space.type === 'risk') typeBg = "bg-amber-950/60 border-amber-500/40 text-amber-200";
+        else if (space.type === 'decision') typeBg = "bg-purple-950/60 border-purple-400/40 text-purple-200";
+        else if (space.type === 'knowledge' || space.type === 'calc') typeBg = "bg-blue-950/60 border-blue-400/40 text-blue-200";
+        else if (space.type === 'chance') typeBg = "bg-pink-950/60 border-pink-400/40 text-pink-200";
+        else if (space.type === 'finish') typeBg = "bg-gradient-to-br from-amber-900/80 to-brand-muted border-amber-400 text-amber-200 font-bold";
+
+        const card = document.createElement('div');
+        card.className = `space-card ${typeBg} border rounded-xl p-2.5 min-h-[95px] flex flex-col justify-between relative overflow-hidden shadow-sm`;
+        card.id = `space-${idx}`;
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between text-[10px] font-bold opacity-80">
+            <span>#${idx}</span>
+            <span class="uppercase tracking-wider px-1.5 py-0.5 rounded ${badgeBg}">${space.type}</span>
+          </div>
+          <div class="my-1 flex items-center gap-1.5">
+            <i class="fa-solid ${space.icon} text-sm"></i>
+            <h4 class="text-xs font-bold leading-tight line-clamp-2">${space.title}</h4>
+          </div>
+          <p class="text-[9px] opacity-70 line-clamp-1">${space.desc}</p>
+
+          <!-- Tokens Area -->
+          <div id="tokens-space-${idx}" class="flex flex-wrap gap-1 mt-1 min-h-[16px]"></div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function updateBoardTokens() {
+      // Clear old tokens
+      BOARD_SPACES.forEach((_, idx) => {
+        const tokenContainer = document.getElementById(`tokens-space-${idx}`);
+        if (tokenContainer) tokenContainer.innerHTML = '';
+      });
+
+      // Place active tokens
+      players.forEach(p => {
+        const tokenContainer = document.getElementById(`tokens-space-${p.position}`);
+        if (tokenContainer) {
+          const token = document.createElement('span');
+          token.className = `inline-flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-extrabold text-brand-dark shadow-md border border-white transition-all transform scale-110`;
+          token.style.backgroundColor = p.color;
+          token.title = p.name;
+          token.innerHTML = `<i class="fa-solid ${p.icon}"></i>`;
+          tokenContainer.appendChild(token);
+        }
+      });
+    }
+
+    /* ================= GAME LOGIC & TURN CONTROLLER ================= */
+
+    function updatePlayersUI() {
+      const container = document.getElementById('playersList');
+      container.innerHTML = '';
+
+      players.forEach((p, idx) => {
+        const isActive = idx === activePlayerIndex;
+        const card = document.createElement('div');
+        card.className = `p-3 rounded-xl border ${isActive ? 'bg-brand-muted/40 border-brand-soft ring-2 ring-brand-soft/50' : 'bg-brand-dark/40 border-brand-soft/20'} transition`;
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-1">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full" style="background-color: ${p.color}"></span>
+              <span class="text-xs font-bold text-brand-cream">${p.name} ${p.finished ? '(Finished)' : ''}</span>
+            </div>
+            ${isActive ? '<span class="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/40">TURN</span>' : ''}
+          </div>
+          <div class="grid grid-cols-2 gap-1 text-[11px] text-brand-soft mt-1">
+            <div>Capital: <span class="text-brand-cream font-bold">₹${p.cash.toLocaleString()}</span></div>
+            <div>Score: <span class="text-amber-300 font-bold">${p.fls} FLS</span></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function updateActiveTurnDisplay() {
+      const p = players[activePlayerIndex];
+      const disp = document.getElementById('activePlayerDisplay');
+      disp.innerText = `${p.name}'s Turn`;
+      disp.style.color = p.color;
+    }
+
+    function rollDice() {
+      if (!gameStarted || isDiceRolling) return;
+
+      const activePlayer = players[activePlayerIndex];
+      if (activePlayer.finished) {
+        nextTurn();
+        return;
+      }
+
+      isDiceRolling = true;
+      const diceBox = document.getElementById('diceBox');
+      const diceValueEl = document.getElementById('diceValue');
+
+      diceBox.classList.add('dice-roll');
+      
+      let rolls = 0;
+      const rollInterval = setInterval(() => {
+        const randomTemp = Math.floor(Math.random() * 6) + 1;
+        diceValueEl.innerText = randomTemp;
+        rolls++;
+        if (rolls > 8) {
+          clearInterval(rollInterval);
+          diceBox.classList.remove('dice-roll');
+
+          const finalDice = Math.floor(Math.random() * 6) + 1;
+          diceValueEl.innerText = finalDice;
+          isDiceRolling = false;
+
+          advancePlayer(activePlayerIndex, finalDice);
+        }
+      }, 60);
+    }
+
+    function advancePlayer(playerIdx, steps) {
+      const player = players[playerIdx];
+      const oldPos = player.position;
+      let newPos = oldPos + steps;
+
+      if (newPos >= BOARD_SPACES.length - 1) {
+        newPos = BOARD_SPACES.length - 1; // Land on Finish
+        player.finished = true;
+        logStatus(`${player.name} reached the FINISH space! 🎉`);
+      }
+
+      // Check if passed Start space in loop
+      if (newPos < oldPos && !player.finished) {
+        player.cash += 10000;
+        logStatus(`${player.name} passed START and collected ₹10,000 allowance!`);
+      }
+
+      player.position = newPos;
+      updateBoardTokens();
+      updatePlayersUI();
+
+      // Trigger space event
+      setTimeout(() => {
+        handleSpaceLanding(player, BOARD_SPACES[newPos]);
+      }, 400);
+    }
+
+    function handleSpaceLanding(player, space) {
+      logStatus(`${player.name} landed on Space #${space.id}: ${space.title}`);
+
+      if (space.type === 'start') {
+        player.cash += 5000;
+        player.fls += 10;
+        updatePlayersUI();
+        showNotificationModal("Start Space Reward", `You rested at Start! Recieved ₹5,000 & +10 FLS.`);
+      } 
+      else if (space.type === 'reward') {
+        player.cash += 10000;
+        player.fls += 15;
+        updatePlayersUI();
+        showNotificationModal("Reward Space!", `Financial Discipline Reward: Earned +₹10,000 cash and +15 Financial Literacy Points!`);
+      } 
+      else if (space.type === 'finish') {
+        checkGameOver();
+      } 
+      else {
+        // Trigger Card Challenge Modal
+        triggerCardChallenge(player, space);
+      }
+    }
+
+    /* ================= CARD MODAL SYSTEM ================= */
+
+    let currentCardData = null;
+
+    function triggerCardChallenge(player, space) {
+      const modal = document.getElementById('cardModal');
+      const badge = document.getElementById('cardBadge');
+      const title = document.getElementById('cardSpaceTitle');
+      const question = document.getElementById('cardQuestion');
+      const desc = document.getElementById('cardDescription');
+      const optionsContainer = document.getElementById('cardOptions');
+      const feedback = document.getElementById('cardFeedback');
+      const continueBtn = document.getElementById('cardContinueBtn');
+      const modalPlayerTag = document.getElementById('modalPlayerTag');
+
+      modalPlayerTag.innerText = player.name;
+      modalPlayerTag.style.borderColor = player.color;
+      title.innerText = `Space #${space.id}: ${space.title}`;
+      badge.innerText = `${space.type.toUpperCase()} CARD`;
+
+      feedback.classList.add('hidden');
+      continueBtn.classList.add('hidden');
+      optionsContainer.innerHTML = '';
+
+      // Select Card Type
+      if (space.type === 'chance') {
+        const chanceList = CARD_DATA.chance;
+        const card = chanceList[Math.floor(Math.random() * chanceList.length)];
+        currentCardData = { type: 'chance', ...card };
+
+        question.innerText = card.title;
+        desc.innerText = card.text;
+
+        const actionBtn = document.createElement('button');
+        actionBtn.className = "w-full py-3 bg-brand-soft text-brand-dark font-bold rounded-xl hover:bg-brand-cream transition";
+        actionBtn.innerText = "Acknowledge Event";
+        actionBtn.onclick = () => applyChanceOutcome(player, card);
+        optionsContainer.appendChild(actionBtn);
+
+      } else {
+        // Knowledge, Decision, Risk, Calc
+        const pool = CARD_DATA[space.type] || CARD_DATA.knowledge;
+        const card = pool[Math.floor(Math.random() * pool.length)];
+        currentCardData = { type: space.type, ...card };
+
+        question.innerText = card.title;
+        desc.innerText = card.question;
+
+        card.options.forEach((opt, idx) => {
+          const btn = document.createElement('button');
+          btn.className = "w-full text-left p-3 rounded-xl border border-brand-soft/30 bg-brand-dark/50 hover:bg-brand-muted/50 text-xs font-semibold text-brand-cream transition flex items-center justify-between";
+          btn.innerHTML = `<span>${opt.text}</span> <i class="fa-solid fa-chevron-right text-brand-soft/50"></i>`;
+          btn.onclick = () => handleCardAnswer(player, opt, card);
+          optionsContainer.appendChild(btn);
+        });
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function applyChanceOutcome(player, card) {
+      if (card.reward) {
+        player.cash += card.amount;
+        player.fls += card.points;
+      } else {
+        player.cash = Math.max(0, player.cash - card.amount);
+      }
+      updatePlayersUI();
+
+      const feedback = document.getElementById('cardFeedback');
+      feedback.className = `p-3.5 rounded-xl border text-xs leading-relaxed mt-4 ${card.reward ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-200' : 'bg-red-950/60 border-red-500/50 text-red-200'}`;
+      feedback.innerText = card.reward 
+        ? `Result: +₹${card.amount.toLocaleString()} Cash & +${card.points} Literacy Points!` 
+        : `Result: Deducted -₹${card.amount.toLocaleString()} for emergency cost.`;
+      
+      feedback.classList.remove('hidden');
+      document.getElementById('cardOptions').innerHTML = '';
+      document.getElementById('cardContinueBtn').classList.remove('hidden');
+    }
+
+    function handleCardAnswer(player, selectedOption, card) {
+      const feedback = document.getElementById('cardFeedback');
+      const optionsContainer = document.getElementById('cardOptions');
+      const continueBtn = document.getElementById('cardContinueBtn');
+
+      optionsContainer.innerHTML = ''; // Lock choice
+
+      if (selectedOption.correct) {
+        player.cash += 10000;
+        player.fls += 20;
+        feedback.className = "p-3.5 rounded-xl border text-xs leading-relaxed mt-4 bg-emerald-950/70 border-emerald-500/60 text-emerald-200";
+        feedback.innerHTML = `<strong><i class="fa-solid fa-circle-check mr-1"></i> Excellent Financial Decision!</strong><br>${selectedOption.reason}<br><br><span class="font-bold text-emerald-400">+₹10,000 Cash | +20 Literacy Points</span>`;
+      } else {
+        player.cash = Math.max(0, player.cash - 3000);
+        player.fls = Math.max(0, player.fls - 5);
+        feedback.className = "p-3.5 rounded-xl border text-xs leading-relaxed mt-4 bg-red-950/70 border-red-500/60 text-red-200";
+        feedback.innerHTML = `<strong><i class="fa-solid fa-triangle-exclamation mr-1"></i> Sub-optimal Choice / Risk Missed!</strong><br>${selectedOption.reason}<br><br><span class="font-bold text-red-300">-₹3,000 Penalty | -5 Literacy Points</span>`;
+      }
+
+      updatePlayersUI();
+      feedback.classList.remove('hidden');
+      continueBtn.classList.remove('hidden');
+    }
+
+    function closeCardModal() {
+      document.getElementById('cardModal').classList.add('hidden');
+      
+      // Check if all players reached finish
+      if (!checkGameOver()) {
+        nextTurn();
+      }
+    }
+
+    function showNotificationModal(titleText, bodyText) {
+      const modal = document.getElementById('cardModal');
+      document.getElementById('cardBadge').innerText = "INFO";
+      document.getElementById('cardSpaceTitle').innerText = titleText;
+      document.getElementById('cardQuestion').innerText = titleText;
+      document.getElementById('cardDescription').innerText = bodyText;
+      document.getElementById('cardOptions').innerHTML = '';
+      
+      const feedback = document.getElementById('cardFeedback');
+      feedback.classList.add('hidden');
+      
+      const continueBtn = document.getElementById('cardContinueBtn');
+      continueBtn.classList.remove('hidden');
+      modal.classList.remove('hidden');
+    }
+
+    function nextTurn() {
+      // Find next player who isn't finished
+      let attempts = 0;
+      do {
+        activePlayerIndex = (activePlayerIndex + 1) % playerCount;
+        attempts++;
+      } while (players[activePlayerIndex].finished && attempts <= playerCount);
+
+      updatePlayersUI();
+      updateActiveTurnDisplay();
+      
+      // Update Smart Tip
+      document.getElementById('randomTip').innerText = `"${TIPS[Math.floor(Math.random() * TIPS.length)]}"`;
+    }
+
+    function checkGameOver() {
+      const allFinished = players.every(p => p.finished || p.position >= BOARD_SPACES.length - 1);
+      if (allFinished) {
+        showGameOverLeaderboard();
+        return true;
+      }
+      return false;
+    }
+
+    function showGameOverLeaderboard() {
+      const modal = document.getElementById('gameOverModal');
+      const list = document.getElementById('leaderboardList');
+      list.innerHTML = '';
+
+      // Calculate Total Final Score = Cash + (FLS * 500)
+      const sorted = [...players].map(p => ({
+        ...p,
+        totalScore: p.cash + (p.fls * 500)
+      })).sort((a, b) => b.totalScore - a.totalScore);
+
+      sorted.forEach((p, rank) => {
+        const item = document.createElement('div');
+        item.className = `p-3 rounded-xl border flex items-center justify-between ${rank === 0 ? 'bg-amber-950/60 border-amber-400 text-amber-200 font-bold' : 'bg-brand-dark/40 border-brand-soft/20 text-brand-cream'}`;
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-6 h-6 rounded-full bg-brand-muted flex items-center justify-center text-xs text-brand-cream">${rank + 1}</span>
+            <div>
+              <p class="text-xs font-bold" style="color: ${p.color}">${p.name} ${rank === 0 ? '👑 Winner' : ''}</p>
+              <p class="text-[10px] opacity-75">Capital: ₹${p.cash.toLocaleString()} | Score: ${p.fls} FLS</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-mono font-extrabold text-amber-300">Total: ₹${p.totalScore.toLocaleString()}</span>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+
+      modal.classList.remove('hidden');
+    }
+
+    /* ================= UTILS & INFOGRAPHIC CHARTS ================= */
+
+    function logStatus(msg) {
+      document.getElementById('gameStatusLog').innerText = msg;
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function initCharts() {
+      // 1. Compounding Chart
+      const ctx1 = document.getElementById('compoundingChart')?.getContext('2d');
+      if (ctx1) {
+        new Chart(ctx1, {
+          type: 'line',
+          data: {
+            labels: ['Year 0', 'Year 5', 'Year 10', 'Year 15', 'Year 20'],
+            datasets: [
+              {
+                label: 'Compound Interest (10%)',
+                data: [10000, 16105, 25937, 41772, 67275],
+                borderColor: '#DFB6B2',
+                backgroundColor: 'rgba(223, 182, 178, 0.2)',
+                fill: true,
+                tension: 0.3
+              },
+              {
+                label: 'Simple Interest (10%)',
+                data: [10000, 15000, 20000, 25000, 30000],
+                borderColor: '#854F6C',
+                borderDash: [5, 5],
+                fill: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: '#FBE4D8', font: { size: 9 } } }
+            },
+            scales: {
+              x: { ticks: { color: '#DFB6B2', font: { size: 8 } } },
+              y: { ticks: { color: '#DFB6B2', font: { size: 8 } } }
+            }
+          }
+        });
+      }
+
+      // 2. Budgeting Pie Chart
+      const ctx2 = document.getElementById('budgetChart')?.getContext('2d');
+      if (ctx2) {
+        new Chart(ctx2, {
+          type: 'doughnut',
+          data: {
+            labels: ['Needs (50%)', 'Wants (30%)', 'Savings (20%)'],
+            datasets: [{
+              data: [50, 30, 20],
+              backgroundColor: ['#522B5B', '#854F6C', '#DFB6B2'],
+              borderWidth: 1,
+              borderColor: '#2B124C'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'right', labels: { color: '#FBE4D8', font: { size: 9 } } }
+            }
+          }
+        });
+      }
+    }
+  </script>
+</body>
+</html>
